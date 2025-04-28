@@ -34,7 +34,8 @@
     {{-- Modal --}}
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form id="userForm">
+            <form id="userForm" enctype="multipart/form-data">
+                @csrf
             <div class="modal-content">
                 <div class="modal-header">
                 <h5 class="modal-title" id="userModalLabel">Tambah/Edit User</h5>
@@ -73,8 +74,8 @@
                 </div>
                 </div>
                 <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
             </div>
             </form>
@@ -117,6 +118,41 @@
             $('#userForm').trigger('reset');
             $('#user_id').val('');
             $('#userModal').modal('show');
+        });
+
+        $('#userForm').submit(function(e){
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            $.ajax({
+                method: 'POST',
+                url: "{{ route('users.store') }}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(res){
+                    if(res.success){
+                        $('#userModal').modal('hide');
+                        $('#usersTable').DataTable().ajax.reload();
+                        alert('Data berhasil ditambahkan!');
+                    }
+                },
+                error: function(err){
+                    if(err.responseJSON && err.responseJSON.errors){
+                        let errors = err.responseJSON.errors;
+                        let errorMessages = '';
+
+                        $.each(errors, function(key, value){
+                            errorMessages += value[0] + '\n';
+                        });
+
+                        alert('Gagal menambahkan data:\n' + errorMessages);
+                    } else {
+                        alert('Gagal menambahkan data.');
+                    }
+                    console.log(err.responseJSON);
+                }
+            });
         });
     });
 

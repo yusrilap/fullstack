@@ -22,4 +22,36 @@ class UserController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'name'    => 'required|string|max:255',
+            'phone'   => 'nullable|string|max:20',
+            'email'   => 'required|email|unique:users,email',
+            'address' => 'nullable|string',
+            'photo'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('photos', 'public');
+        }
+
+        $user = User::create([
+            'role_id' => $request->role_id,
+            'name'    => $request->name,
+            'phone'   => $request->phone,
+            'email'   => $request->email,
+            'address' => $request->address,
+            'photo'   => $photoPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User Berhasil ditambahkan!',
+            'data'  => $user
+        ]);
+    }
+
 }

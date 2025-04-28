@@ -20,3 +20,4 @@ Route::get('/', function () {
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/fetch', [UserController::class, 'fetch'])->name('users.fetch');
+Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
