@@ -23,3 +23,4 @@ Route::get('/users/fetch', [UserController::class, 'fetch'])->name('users.fetch'
 Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
 Route::get('/users/{id}/edit', [UserController::class, 'edit']);
 Route::post('/users/{id}/update', [UserController::class, 'update']);
+Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);

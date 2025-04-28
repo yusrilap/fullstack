@@ -135,8 +135,32 @@ $(function() {
         });
     });
 
-    // Submit
+    //Delete Data
+    $(document).on('click', '.deleteUser', function(){
+        if (confirm('Apakah kamu yakin ingin menghapus data ini?')) {
+            var id = $(this).data('id');
 
+            $.ajax({
+                url: `/users/${id}/delete`,
+                type: 'DELETE',
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    if (res.success) {
+                        $('#usersTable').DataTable().ajax.reload();
+                        alert(res.message);
+                    }
+                },
+                error: function(err) {
+                    alert('Gagal menghapus data.');
+                    console.log(err.responseJSON);
+                }
+            });
+        }
+    });
+
+    // Submit
     $('#userForm').submit(function(e){
         e.preventDefault();
         var formData = new FormData(this);

@@ -95,4 +95,18 @@ class UserController extends Controller
         ]);
     }
 
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->photo) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        $user->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus!'
+        ]);
+    }
+
 }
