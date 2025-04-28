@@ -13,11 +13,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use SoftDeletes;
+
     protected $fillable = [
         'role_id',
         'name',
@@ -27,9 +24,9 @@ class User extends Authenticatable
         'photo',
     ];
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsTo(roles::class);
+        return $this->belongsTo(Roles::class, 'role_id');
     }
 
 }

@@ -37,7 +37,7 @@
             <form id="userForm">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Add/Edit User</h5>
+                <h5 class="modal-title" id="userModalLabel">Tambah/Edit User</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -106,7 +106,7 @@
                     render: function(data) {
                         return `
                             <button class="btn btn-success btn-sm editUser" data-id="${data}">Edit</button>
-                            <button class="btn btn-danger btn-sm deleteUser" data-id="${data}">Delete</button>
+                            <button class="btn btn-danger btn-sm deleteUser" data-id="${data}">Hapus</button>
                         `;
                     }
                 }
