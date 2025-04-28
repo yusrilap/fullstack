@@ -31,135 +31,160 @@
     </table>
 </div>
 
-    {{-- Modal --}}
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form id="userForm" enctype="multipart/form-data">
-                @csrf
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Tambah/Edit User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                <input type="hidden" name="user_id" id="user_id">
-                <div class="mb-3">
-                    <label>Role</label>
-                    <select name="role_id" class="form-control" required>
-                        <option value="">Select Role</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label>Name</label>
-                    <input type="text" name="name" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Phone</label>
-                    <input type="text" name="phone" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Address</label>
-                    <textarea name="address" class="form-control"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label>Photo</label>
-                    <input type="file" name="photo" class="form-control">
-                </div>
-                </div>
-                <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                </div>
+{{-- Modal --}}
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="userForm" enctype="multipart/form-data">
+            @csrf
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="userModalLabel">Tambah/Edit User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            </form>
+            <div class="modal-body">
+            <input type="hidden" name="user_id" id="user_id">
+            <div class="mb-3">
+                <label>Role</label>
+                <select name="role_id" class="form-control" required>
+                    <option value="">Select Role</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Address</label>
+                <textarea name="address" class="form-control"></textarea>
+            </div>
+            <div class="mb-3">
+                <label>Photo</label>
+                <input type="file" name="photo" class="form-control">
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Simpan</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            </div>
         </div>
+        </form>
     </div>
+</div>
 
-    <script>
-    $(function() {
-        var table = $('#usersTable').DataTable({
-            ajax: "{{ route('users.fetch') }}",
-            columns: [
-                {data: 'id'},
-                {data: 'role.name'},
-                {data: 'name'},
-                {data: 'phone'},
-                {data: 'email'},
-                {data: 'address'},
-                {
-                    data: 'photo',
-                    render: function(data) {
-                        if(data){
-                            return `<img src="/storage/${data}" width="50" height="50"/>`;
-                        }
-                        return '';
+<script>
+$(function() {
+    var table = $('#usersTable').DataTable({
+        ajax: "{{ route('users.fetch') }}",
+        columns: [
+            {data: 'id'},
+            {data: 'role.name'},
+            {data: 'name'},
+            {data: 'phone'},
+            {data: 'email'},
+            {data: 'address'},
+            {
+                data: 'photo',
+                render: function(data) {
+                    if(data){
+                        return `<img src="/storage/${data}" width="50" height="50"/>`;
                     }
-                },
-                {
-                    data: 'id',
-                    render: function(data) {
-                        return `
-                            <button class="btn btn-success btn-sm editUser" data-id="${data}">Edit</button>
-                            <button class="btn btn-danger btn-sm deleteUser" data-id="${data}">Hapus</button>
-                        `;
-                    }
+                    return '';
                 }
-            ]
-        });
+            },
+            {
+                data: 'id',
+                render: function(data) {
+                    return `
+                        <button class="btn btn-success btn-sm editUser" data-id="${data}">Edit</button>
+                        <button class="btn btn-danger btn-sm deleteUser" data-id="${data}">Hapus</button>
+                    `;
+                }
+            }
+        ]
+    });
 
-        $('#btnTambahUser').click(function(){
-            $('#userForm').trigger('reset');
-            $('#user_id').val('');
+    // Tambah Data
+    $('#btnTambahUser').click(function(){
+        $('#userForm').trigger('reset');
+        $('#user_id').val('');
+        $('#userModal').modal('show');
+    });
+
+    // Edit Data
+    $(document).on('click', '.editUser', function(){
+        var id = $(this).data('id');
+        $.get("/users/" + id + "/edit", function(user){
             $('#userModal').modal('show');
-        });
-
-        $('#userForm').submit(function(e){
-            e.preventDefault();
-            var formData = new FormData(this);
-
-            $.ajax({
-                method: 'POST',
-                url: "{{ route('users.store') }}",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(res){
-                    if(res.success){
-                        $('#userModal').modal('hide');
-                        $('#usersTable').DataTable().ajax.reload();
-                        alert('Data berhasil ditambahkan!');
-                    }
-                },
-                error: function(err){
-                    if(err.responseJSON && err.responseJSON.errors){
-                        let errors = err.responseJSON.errors;
-                        let errorMessages = '';
-
-                        $.each(errors, function(key, value){
-                            errorMessages += value[0] + '\n';
-                        });
-
-                        alert('Gagal menambahkan data:\n' + errorMessages);
-                    } else {
-                        alert('Gagal menambahkan data.');
-                    }
-                    console.log(err.responseJSON);
-                }
-            });
+            $('#user_id').val(user.id);
+            $('[name="role_id"]').val(user.role_id);
+            $('[name="name"]').val(user.name);
+            $('[name="phone"]').val(user.phone);
+            $('[name="email"]').val(user.email);
+            $('[name="address"]').val(user.address);
         });
     });
 
-    </script>
+    // Submit
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    $('#userForm').submit(function(e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        var userId = $('#user_id').val();
+        var url = "";
+
+        if (userId) {
+            url = `/users/${userId}/update`;
+        } else {
+            url = "{{ route('users.store') }}";
+        }
+
+        $.ajax({
+            method: 'POST',
+            url: url,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(res){
+                if(res.success){
+                    $('#userModal').modal('hide');
+                    $('#usersTable').DataTable().ajax.reload();
+                    alert(res.message);
+                }
+            },
+            error: function(err){
+                if(err.responseJSON && err.responseJSON.errors){
+                    let errors = err.responseJSON.errors;
+                    let errorMessages = '';
+
+                    $.each(errors, function(key, value){
+                        errorMessages += value[0] + '\n';
+                    });
+
+                    alert('Error:\n' + errorMessages);
+                } else {
+                    alert('Terjadi kesalahan.');
+                }
+                console.log(err.responseJSON);
+            }
+        });
+    });
+});
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\roles;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -51,6 +52,46 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User Berhasil ditambahkan!',
             'data'  => $user
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $user = User::with('role')->findOrFail($id);
+        return response()->json($user);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::FindOrFail($id);
+
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'name'    => 'required|string|max:255',
+            'phone'   => 'nullable|string|max:20',
+            'email'   => 'required|email|unique:users,email,'. $id,
+            'address' => 'nullable|string',
+            'photo'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            $photoPath = $request->file('photo')->store('photos', 'public');
+            $user->photo = $photoPath;
+        }
+
+        $user->role_id = $request->role_id;
+        $user->name = $request->name;
+        $user->phone = $request->phone;
+        $user->email = $request->email;
+        $user->address = $request->address;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil diupdate!',
         ]);
     }
 
