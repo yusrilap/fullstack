@@ -28,3 +28,5 @@ Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);
 
 Route::post('/users/{id}/activate', [UserController::class, 'activate']);
 Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate']);
+
+Route::get('/users/{id}/detail', [UserController::class, 'show']);

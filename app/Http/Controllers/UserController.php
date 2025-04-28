@@ -18,25 +18,50 @@ class UserController extends Controller
 
     public function fetch(Request $request)
     {
+        // $users = User::with('role');
+
+        // return DataTables::of($users)
+        //     ->addColumn('role_name', function($user){
+        //         return $user->role ? $user->role->name : '-';
+        //     })
+        //     ->addColumn('action', function($user){
+        //         return '
+        //             <button class="btn btn-info btn-sm detailUser" data-id="'.$user->id.'">Detail</button>
+        //             <button class="btn btn-success btn-sm editUser" data-id="'.$user->id.'">Edit</button>
+        //             <button class="btn btn-danger btn-sm deleteUser" data-id="'.$user->id.'">Delete</button>
+        //         ';
+        //     })
+        //     ->rawColumns(['action'])
+        //     ->make(true);
+
         if ($request->ajax()) {
-        $users = User::with('role')->select('users.*');
+            $data = User::with('role')->select('users.*');
 
-        return Datatables::of($users)
-            ->addColumn('photo', function($row){
-                return $row->photo ? '<img src="/storage/'.$row->photo.'" width="50" height="50"/>' : '';
-            })
-            ->addColumn('action', function($row){
-                $btn = '<button class="btn btn-success btn-sm editUser" data-id="'.$row->id.'">Edit</button> ';
-                $btn .= '<button class="btn btn-danger btn-sm deleteUser" data-id="'.$row->id.'">Hapus</button> ';
-                $btn .= '<button class="btn btn-info btn-sm detailUser" data-id="'.$row->id.'">Detail</button> ';
-                $btn .= $row->is_active
-                    ? '<button class="btn btn-warning btn-sm deactivateUser" data-id="'.$row->id.'">Nonaktifkan</button>'
-                    : '<button class="btn btn-primary btn-sm activateUser" data-id="'.$row->id.'">Aktifkan</button>';
+            return DataTables::of($data)
+                ->addColumn('role_name', function($row){
+                    return $row->role ? $row->role->name : '-';
+                })
+                ->addColumn('photo', function($row){
+                    if($row->photo){
+                        return '<img src="'.asset('storage/'.$row->photo).'" width="50" height="50">';
+                    }
+                    return '';
+                })
+                ->addColumn('action', function($row){
+                    $btn = '';
+                    $btn .= '<button class="btn btn-info btn-sm detailUser" data-id="'.$row->id.'">Detail</button> ';
+                    $btn .= '<button class="btn btn-success btn-sm editUser" data-id="'.$row->id.'">Edit</button> ';
+                    $btn .= '<button class="btn btn-danger btn-sm deleteUser" data-id="'.$row->id.'">Hapus</button> ';
+                    if($row->is_active){
+                        $btn .= '<button class="btn btn-warning btn-sm deactivateUser" data-id="'.$row->id.'">Deactivate</button>';
+                    }else{
+                        $btn .= '<button class="btn btn-primary btn-sm activateUser" data-id="'.$row->id.'">Activate</button>';
+                    }
 
-                return $btn;
-            })
-            ->rawColumns(['photo', 'action'])
-            ->make(true);
+                    return $btn;
+                })
+                ->rawColumns(['photo', 'action'])
+                ->make(true);
         }
     }
 
@@ -150,5 +175,14 @@ class UserController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $user = User::with('role')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
 
 }

@@ -85,32 +85,19 @@
 <script>
 $(function() {
     var table = $('#usersTable').DataTable({
+        processing: true,
+        serverSide: true,
         ajax: "{{ route('users.fetch') }}",
         columns: [
-            {data: 'id'},
-            {data: 'role.name'},
-            {data: 'name'},
-            {data: 'phone'},
-            {data: 'email'},
-            {data: 'address'},
-            {
-                data: 'photo',
-                render: function(data) {
-                    if(data){
-                        return `<img src="/storage/${data}" width="50" height="50"/>`;
-                    }
-                    return '';
-                }
-            },
-            {
-                data: 'id',
-                render: function(data) {
-                    return `
-                        <button class="btn btn-success btn-sm editUser" data-id="${data}">Edit</button>
-                        <button class="btn btn-danger btn-sm deleteUser" data-id="${data}">Hapus</button>
-                    `;
-                }
-            }
+            {data: 'id', name: 'id'},
+            {data: 'role_name', name: 'role.name'},
+            {data: 'name', name: 'name'},
+            {data: 'phone', name: 'phone'},
+            {data: 'email', name: 'email'},
+            {data: 'address', name: 'address'},
+            {data: 'photo', name: 'photo', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+
         ]
     });
 
@@ -222,6 +209,24 @@ $(function() {
             if(res.success){
                 $('#usersTable').DataTable().ajax.reload();
                 alert(res.message);
+            }
+        });
+    });
+
+    // detail user
+    $(document).on('click', '.detailUser', function(){
+        var id = $(this).data('id');
+        $.get(`/users/${id}/detail`, function(res){
+            if(res.success){
+                let user = res.data;
+                alert(
+                    `Role: ${user.role.name}\n` +
+                    `Name: ${user.name}\n` +
+                    `Phone: ${user.phone}\n` +
+                    `Email: ${user.email}\n` +
+                    `Address: ${user.address}\n` +
+                    `Status: ${user.is_active ? 'Active' : 'Inactive'}`
+                );
             }
         });
     });
