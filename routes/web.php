@@ -24,3 +24,7 @@ Route::post('/users/store', [UserController::class, 'store'])->name('users.store
 Route::get('/users/{id}/edit', [UserController::class, 'edit']);
 Route::post('/users/{id}/update', [UserController::class, 'update']);
 Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);
+
+
+Route::post('/users/{id}/activate', [UserController::class, 'activate']);
+Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate']);

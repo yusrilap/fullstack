@@ -203,6 +203,28 @@ $(function() {
             }
         });
     });
+
+    // activate user
+    $(document).on('click', '.activateUser', function(){
+        var id = $(this).data('id');
+        $.post(`/users/${id}/activate`, {_token: "{{ csrf_token() }}"}, function(res){
+            if(res.success){
+                $('#usersTable').DataTable().ajax.reload();
+                alert(res.message);
+            }
+        });
+    });
+
+    // deactivate user
+    $(document).on('click', '.deactivateUser', function(){
+        var id = $(this).data('id');
+        $.post(`/users/${id}/deactivate`, {_token: "{{ csrf_token() }}"}, function(res){
+            if(res.success){
+                $('#usersTable').DataTable().ajax.reload();
+                alert(res.message);
+            }
+        });
+    });
 });
 
 </script>

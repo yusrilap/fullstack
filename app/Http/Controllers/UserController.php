@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\roles;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
@@ -15,12 +16,28 @@ class UserController extends Controller
         return view('users.index', compact('roles'));
     }
 
-    public function fetch()
+    public function fetch(Request $request)
     {
-        $users = User::with('role')->get();
-        return response()->json([
-            'data' => $users
-        ]);
+        if ($request->ajax()) {
+        $users = User::with('role')->select('users.*');
+
+        return Datatables::of($users)
+            ->addColumn('photo', function($row){
+                return $row->photo ? '<img src="/storage/'.$row->photo.'" width="50" height="50"/>' : '';
+            })
+            ->addColumn('action', function($row){
+                $btn = '<button class="btn btn-success btn-sm editUser" data-id="'.$row->id.'">Edit</button> ';
+                $btn .= '<button class="btn btn-danger btn-sm deleteUser" data-id="'.$row->id.'">Hapus</button> ';
+                $btn .= '<button class="btn btn-info btn-sm detailUser" data-id="'.$row->id.'">Detail</button> ';
+                $btn .= $row->is_active
+                    ? '<button class="btn btn-warning btn-sm deactivateUser" data-id="'.$row->id.'">Nonaktifkan</button>'
+                    : '<button class="btn btn-primary btn-sm activateUser" data-id="'.$row->id.'">Aktifkan</button>';
+
+                return $btn;
+            })
+            ->rawColumns(['photo', 'action'])
+            ->make(true);
+        }
     }
 
     public function store(Request $request)
@@ -108,5 +125,30 @@ class UserController extends Controller
             'message' => 'Data berhasil dihapus!'
         ]);
     }
+
+    public function activate($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_active = true;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User diaktifkan!'
+        ]);
+    }
+
+    public function deactivate($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_active = false;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User dinonaktifkan!'
+        ]);
+    }
+
 
 }
